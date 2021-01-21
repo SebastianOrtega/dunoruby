@@ -56,12 +56,13 @@ begin
 			tiempo=0
 			
 			dig_in = r.gpio.to_i
-			while tiempo<30 && dig_in<1 do
+			while tiempo<40 && dig_in<1 do    #210 para 28 segs
 				dig_in = r.gpio.to_i
 				sleep 0.1
 				tiempo = tiempo+1
 				puts "#{tiempo} #{dig_in}"
 			end
+			sleep 3
 			puts "Digital input : #{dig_in}"
 			tagString=r.taglist
 			if !tagString.include? noTags
@@ -74,7 +75,7 @@ begin
 
 				puts datoSeparado
 				puts 'Tags Found:'+nuevo.length().to_s
-				body = {'Entrada' => dig_in, "tags"=>nuevo.length().to_s, "datos"=>datoSeparado}	
+				body = {'Equipo'=>r.readername,'Entrada' => dig_in, "tags"=>nuevo.length().to_s, "datos"=>datoSeparado}	
 				req.body = JSON[body]
 				response = Net::HTTP.new(host, port).start {|http| http.request(req) }
 				if response.code!="200"
