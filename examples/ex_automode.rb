@@ -29,7 +29,7 @@ begin
 	puts ipaddress
 #Configura POST
 	port = 8080
-	host = "192.168.0.47"
+	host = "192.168.0.170"
 	path = "/"
 
 	body = {}
@@ -48,12 +48,20 @@ begin
    		r.taglistformat = "custom"
 		#r.automodereset # reset to the default automode settings (no triggers, no delays, etc.)
 		r.automode = 'on'
-		puts 'Reading for 3 seconds...'	
-		
-		
-		loop do		
-		  	dig_in = r.gpio.to_i
 			
+		
+		
+		loop do
+
+			tiempo=0
+			
+			dig_in = r.gpio.to_i
+			while tiempo<30 && dig_in<1 do
+				dig_in = r.gpio.to_i
+				sleep 0.1
+				tiempo = tiempo+1
+				puts "#{tiempo} #{dig_in}"
+			end
 			puts "Digital input : #{dig_in}"
 			tagString=r.taglist
 			if !tagString.include? noTags
@@ -73,7 +81,7 @@ begin
 					puts response.code
 				end			
 
-				sleep 0.25
+				
 
 			else
 				puts "no hay tags"
