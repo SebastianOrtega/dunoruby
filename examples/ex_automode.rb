@@ -44,7 +44,7 @@ begin
 		puts '----------------------------------'
 		puts "Connected to #{r.readername}"	
 		puts "Automode is currently #{r.automode}"
-		r.taglistcustomformat = "%k, ${TIME1},${TX}"
+		r.taglistcustomformat = "%k, ${TIME1},${COUNT},${RSSI},${NAME},${RX}"
    		r.taglistformat = "custom"
 		#r.automodereset # reset to the default automode settings (no triggers, no delays, etc.)
 		r.automode = 'on'
@@ -98,7 +98,7 @@ begin
 
 				puts datoSeparado
 				puts 'Tags Found:'+nuevo.length().to_s
-				body = {'Equipo'=>r.readername,'Entrada' => dig_in, "tags"=>nuevo.length().to_s, "datos"=>datoSeparado}	
+				body = {'Equipo'=>r.readername,'Entrada' => dig_in, "numerotags"=>nuevo.length().to_s, "datos"=>datoSeparado}	
 				req.body = JSON[body]
 				response = Net::HTTP.new(host, port).start {|http| http.request(req) }
 				if response.code!="200"
