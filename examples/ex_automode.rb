@@ -29,7 +29,7 @@ begin
 	puts ipaddress
 #Configura POST
 	port = 8080
-	host = "192.168.0.170"
+	host = "192.168.0.47"
 	path = "/"
 
 	body = {}
@@ -54,15 +54,38 @@ begin
 		loop do
 
 			tiempo=0
-			
-			dig_in = r.gpio.to_i
+			dig_in = 0
 			while tiempo<40 && dig_in<1 do    #210 para 28 segs
 				dig_in = r.gpio.to_i
+				debouncing=0
+				if dig_in > 0 
+					debouncing=1
+				end
 				sleep 0.1
+				dig_in = r.gpio.to_i
+				if (dig_in)>0 
+					debouncing=debouncing+1
+				end
+				sleep 0.1
+				dig_in = r.gpio.to_i
+				if (dig_in)>0
+					debouncing=debouncing+1
+				end
+				sleep 0.1
+				dig_in = r.gpio.to_i
+				if (dig_in)>0
+					debouncing=debouncing+1
+				end
+				if debouncing!=4
+					dig_in=0
+				end 
+				
+
+
 				tiempo = tiempo+1
-				puts "#{tiempo} #{dig_in}"
+				puts "#{tiempo} #{debouncing} #{dig_in}"
 			end
-			sleep 3
+			
 			puts "Digital input : #{dig_in}"
 			tagString=r.taglist
 			if !tagString.include? noTags

@@ -49,8 +49,8 @@ begin
 			end
 	
 			# bail out when the inputs are all "off"
-			break if dig_in == 0
-
+			#break if dig_in == 1
+			puts dig_in
 			# wait a bit before going around again...
 			sleep 0.25
 		end
