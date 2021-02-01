@@ -29,7 +29,7 @@ begin
 	puts ipaddress
 #Configura POST
 	port = 8080
-	host = "192.168.0.47"
+	host = "192.168.0.170"
 	path = "/"
 
 	body = {}
@@ -49,68 +49,72 @@ begin
 		#r.automodereset # reset to the default automode settings (no triggers, no delays, etc.)
 		r.automode = 'on'
 			
+		loop do  # este primer loop es para manejar el error en caso de falla en la conexion tcp
 		
-		
-		loop do
+			loop do
 
-			tiempo=0
-			dig_in = 0
-			while tiempo<40 && dig_in<1 do    #210 para 28 segs
-				dig_in = r.gpio.to_i
-				debouncing=0
-				if dig_in > 0 
-					debouncing=1
+				tiempo=0
+				dig_in = 0
+				while tiempo<40 && dig_in<1 do    #210 para 28 segs
+					dig_in = r.gpio.to_i
+					debouncing=0
+					if dig_in > 0 
+						debouncing=1
+					end
+					sleep 0.1
+					dig_in = r.gpio.to_i
+					if (dig_in)>0 
+						debouncing=debouncing+1
+					end
+					sleep 0.1
+					dig_in = r.gpio.to_i
+					if (dig_in)>0
+						debouncing=debouncing+1
+					end
+					sleep 0.1
+					dig_in = r.gpio.to_i
+					if (dig_in)>0
+						debouncing=debouncing+1
+					end
+					if debouncing!=4
+						dig_in=0
+					end 
+					
+
+
+					tiempo = tiempo+1
+					puts "#{tiempo} #{debouncing} #{dig_in}"
 				end
-				sleep 0.1
-				dig_in = r.gpio.to_i
-				if (dig_in)>0 
-					debouncing=debouncing+1
-				end
-				sleep 0.1
-				dig_in = r.gpio.to_i
-				if (dig_in)>0
-					debouncing=debouncing+1
-				end
-				sleep 0.1
-				dig_in = r.gpio.to_i
-				if (dig_in)>0
-					debouncing=debouncing+1
-				end
-				if debouncing!=4
-					dig_in=0
-				end 
 				
+				puts "Digital input : #{dig_in}"
+				tagString=r.taglist
+				if !tagString.include? noTags
+					
+					nuevo = tagString.split(/[\n\r]+/)
+					datoSeparado= nuevo.map {
+						|n| n.split(/[,]+/)
+
+					}
+
+					puts datoSeparado
+					puts 'Tags Found:'+nuevo.length().to_s
+					body = {'Equipo'=>r.readername,'Entrada' => dig_in, "numerotags"=>nuevo.length().to_s, "datos"=>datoSeparado}	
+					req.body = JSON[body]
+					response = Net::HTTP.new(host, port).start {|http| http.request(req) }
+					if response.code!="200"
+						puts response.code
+					end		
 
 
-				tiempo = tiempo+1
-				puts "#{tiempo} #{debouncing} #{dig_in}"
-			end
+					
+
+				else
+					puts "no hay tags"
+				end
 			
-			puts "Digital input : #{dig_in}"
-			tagString=r.taglist
-			if !tagString.include? noTags
 				
-				nuevo = tagString.split(/[\n\r]+/)
-				datoSeparado= nuevo.map {
-					|n| n.split(/[,]+/)
-
-				}
-
-				puts datoSeparado
-				puts 'Tags Found:'+nuevo.length().to_s
-				body = {'Equipo'=>r.readername,'Entrada' => dig_in, "numerotags"=>nuevo.length().to_s, "datos"=>datoSeparado}	
-				req.body = JSON[body]
-				response = Net::HTTP.new(host, port).start {|http| http.request(req) }
-				if response.code!="200"
-					puts response.code
-				end			
-
-				
-
-			else
-				puts "no hay tags"
-			end
-			
+			end rescue
+			puts $!
 		end
 
 
@@ -126,6 +130,7 @@ begin
 	# be nice. Close the connection to the reader.
 		r.close
 	end
-rescue
+rescue SocketError => ex
+	#puts ex.inspect
 	puts $!
 end
