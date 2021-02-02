@@ -133,4 +133,5 @@ begin
 rescue SocketError => ex
 	#puts ex.inspect
 	puts $!
+	retry
 end
