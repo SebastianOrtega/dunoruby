@@ -29,7 +29,7 @@ begin
 	puts ipaddress
 #Configura POST
 	port = 8080
-	host = "192.168.0.170"
+	host = "192.168.0.188"
 	path = "/"
 
 	body = {}
@@ -55,7 +55,7 @@ begin
 
 				tiempo=0
 				dig_in = 0
-				while tiempo<40 && dig_in<1 do    #210 para 28 segs
+				while tiempo<40 && dig_in<1 do    #210 para 28 segs   Control de debouncing 
 					dig_in = r.gpio.to_i
 					debouncing=0
 					if dig_in > 0 
