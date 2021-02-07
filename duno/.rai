@@ -1,5 +1,5 @@
 hostname = 192.168.0.235
 username = alien
-password = a113n
+password = password
 cli = ruby
 priority = 80
