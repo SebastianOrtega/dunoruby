@@ -28,7 +28,7 @@ begin
 	ipaddress = config.fetch('reader_address', 'localhost')
 	puts ipaddress
 #Configura POST
-	port = 8080
+	port = 8000
 	host = "192.168.0.188"
 	path = "/"
 
